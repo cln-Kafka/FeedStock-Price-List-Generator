@@ -1,4 +1,4 @@
-package com.example.feed_price_generator
+package com.example.feedstock
 
 import io.flutter.embedding.android.FlutterActivity
 

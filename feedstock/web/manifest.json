@@ -1,6 +1,6 @@
 {
-    "name": "feed_price_generator",
-    "short_name": "feed_price_generator",
+    "name": "feedstock",
+    "short_name": "feedstock",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",

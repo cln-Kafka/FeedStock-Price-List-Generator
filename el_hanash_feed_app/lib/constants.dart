@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:feed_price_generator/models/product.dart';
 
+// Predefined Products
 List<Product> kProducts = [
   Product('سوبر بادي 23%', true),
   Product('سوبر نامي 21%', true),
@@ -24,7 +25,35 @@ const double kPrimaryPaddding = 16.0;
 const double kButtonsBorderRadius = 8.0;
 const double kSizedBoxBaseHeight = 16.0;
 const double kSizedBoxBaseWidth = 8.0;
+const double kCardBorderRadius = 12.0;
+const double kCardMargin = 16.0;
 
 // Fonts
 const String kFontFamily = 'SpaceGrotesk';
 const kBaseFontSize = 16.0;
+
+// In case of overlaying new prices on a template image
+const List<double> kRowPositions = [
+  475,
+  535,
+  595,
+  660,
+  // (skipping the empty row)
+  775,
+  835,
+  895,
+  950,
+];
+
+// Column positions for 25kg, 50kg, ton
+const List<double> kColumnPositions = [
+  400, // 25kg
+  550, // 50kg
+  725, // Ton
+];
+
+// Positions for date and day
+const double kDateX = 130;
+const double kDateY = 210;
+const double kDayX = 140;
+const double kDayY = 240;

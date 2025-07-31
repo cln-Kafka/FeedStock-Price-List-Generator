@@ -5,10 +5,11 @@ import 'package:feed_price_generator/widgets/image_preview.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-class ImageDisplayScreen extends StatelessWidget {
+class ImageDisplayView extends StatelessWidget {
   final Uint8List imageBytes;
+  static const String routeName = '/image-display-view';
 
-  const ImageDisplayScreen({super.key, required this.imageBytes});
+  const ImageDisplayView({super.key, required this.imageBytes});
 
   @override
   Widget build(BuildContext context) {
@@ -52,21 +53,3 @@ class ImageDisplayScreen extends StatelessWidget {
     );
   }
 }
-
-
-/*
-AlertDialog(
-  title: const Text('كيفية الحفظ'),
-  content: const Text(
-    'لحفظ الصورة، قم بأخذ لقطة شاشة باستخدام أزرار الجهاز',
-  ),
-  actions: [
-    TextButton(
-      child: const Text('موافق'),
-      onPressed: () {
-        Navigator.of(context).pop();
-      },
-    ),
-  ],
-);
-*/

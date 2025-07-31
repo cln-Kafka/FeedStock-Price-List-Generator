@@ -1,6 +1,7 @@
 import 'package:device_preview/device_preview.dart';
 import 'package:feed_price_generator/constants.dart';
-import 'package:feed_price_generator/views/price_generator_screen.dart';
+import 'package:feed_price_generator/views/home_view.dart';
+import 'package:feed_price_generator/views/price_generator_view.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
@@ -23,11 +24,7 @@ class FeedStock extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         fontFamily: kFontFamily,
-
-        // Set Scaffold background color
         scaffoldBackgroundColor: kBackgroundColor,
-
-        // Set AppBar theme
         appBarTheme: const AppBarTheme(
           backgroundColor: kBackgroundColor,
           foregroundColor: kFontColor, // title and icon color
@@ -38,7 +35,11 @@ class FeedStock extends StatelessWidget {
       builder: (context, child) {
         return Directionality(textDirection: TextDirection.rtl, child: child!);
       },
-      home: const PriceGeneratorScreen(),
+      routes: {
+        HomeView.routeName: (context) => const HomeView(),
+        PriceGeneratorView.routeName: (context) => const PriceGeneratorView(),
+      },
+      initialRoute: HomeView.routeName,
     );
   }
 }

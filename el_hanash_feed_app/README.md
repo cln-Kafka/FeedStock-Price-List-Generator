@@ -1,16 +1,11 @@
 # el_hanash_feed_app
 
-A new Flutter project.
-
-## Getting Started
-
-This project is a starting point for a Flutter application.
-
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+Features:
+- input prices for each product (pre-defined products set)
+- generate image or reset all prices
+- zoom in and out in the generated image
+- share image
+- save image locally
+- edit prices for that image
+- cache recent lists (up to 20 for example)
+- enable the user to enter products, their available packages, and their prices. [very advanced as it requires automatic generating of the SVG]

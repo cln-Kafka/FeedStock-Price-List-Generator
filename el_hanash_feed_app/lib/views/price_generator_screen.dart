@@ -1,5 +1,7 @@
-import 'package:feed_price_generator/models/product.dart';
+import 'package:feed_price_generator/constants.dart';
 import 'package:feed_price_generator/views/image_display_screen.dart';
+import 'package:feed_price_generator/widgets/custom_app_bar.dart';
+import 'package:feed_price_generator/widgets/custom_elevated_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'dart:ui' as ui;
@@ -12,17 +14,6 @@ class PriceGeneratorScreen extends StatefulWidget {
 }
 
 class _PriceGeneratorScreenState extends State<PriceGeneratorScreen> {
-  final List<Product> products = [
-    Product('سوبر بادي 23%', true),
-    Product('سوبر نامي 21%', true),
-    Product('سوبر ناهي 19%', true),
-    Product('بادي نامي 21%', true),
-    Product('علف مواشي حلاب 19%', false),
-    Product('علف بتلو 21%', false),
-    Product('علف مواشي سوبر 16%', false),
-    Product('علف مواشي سوبر 14%', false),
-  ];
-
   Map<String, Map<String, TextEditingController>> controllers = {};
   TextEditingController dateController = TextEditingController();
   TextEditingController dayController = TextEditingController();
@@ -31,7 +22,7 @@ class _PriceGeneratorScreenState extends State<PriceGeneratorScreen> {
   void initState() {
     super.initState();
     // Initialize controllers
-    for (var product in products) {
+    for (var product in kProducts) {
       controllers[product.name] = {};
       if (product.has25kg) {
         controllers[product.name]!['25kg'] = TextEditingController();
@@ -74,7 +65,7 @@ class _PriceGeneratorScreenState extends State<PriceGeneratorScreen> {
       canvas.drawImage(templateImage, Offset.zero, Paint());
 
       // Set up text style for prices
-      final textStyle = TextStyle(
+      const textStyle = TextStyle(
         color: Colors.brown,
         fontSize: 32,
         fontWeight: FontWeight.bold,
@@ -93,27 +84,37 @@ class _PriceGeneratorScreenState extends State<PriceGeneratorScreen> {
       ];
 
       // Column positions for 25kg, 50kg, ton (adjusted for better spacing)
-      final double col25kg = 400;
-      final double col50kg = 550;
-      final double colTon = 725;
+      const double col25kg = 400;
+      const double col50kg = 550;
+      const double colTon = 725;
 
       // Positions for date and day
-      final double dateX = 130;
-      final double dateY = 210;
-      final double dayX = 140;
-      final double dayY = 240;
+      const double dateX = 130;
+      const double dateY = 210;
+      const double dayX = 140;
+      const double dayY = 240;
 
       // Draw date and day
       if (dateController.text.isNotEmpty) {
-        _drawText(canvas, dateController.text, Offset(dateX, dateY), textStyle);
+        _drawText(
+          canvas,
+          dateController.text,
+          const Offset(dateX, dateY),
+          textStyle,
+        );
       }
       if (dayController.text.isNotEmpty) {
-        _drawText(canvas, dayController.text, Offset(dayX, dayY), textStyle);
+        _drawText(
+          canvas,
+          dayController.text,
+          const Offset(dayX, dayY),
+          textStyle,
+        );
       }
 
       // Draw prices on the image
-      for (int i = 0; i < products.length; i++) {
-        final product = products[i];
+      for (int i = 0; i < kProducts.length; i++) {
+        final product = kProducts[i];
         final y = rowPositions[i];
 
         // Draw 25kg price (if product has it)
@@ -161,6 +162,7 @@ class _PriceGeneratorScreenState extends State<PriceGeneratorScreen> {
       if (pngBytes != null) {
         // Navigate to image display screen
         Navigator.push(
+          // ignore: use_build_context_synchronously
           context,
           MaterialPageRoute(
             builder: (context) =>
@@ -170,6 +172,7 @@ class _PriceGeneratorScreenState extends State<PriceGeneratorScreen> {
       }
     } catch (e) {
       ScaffoldMessenger.of(
+        // ignore: use_build_context_synchronously
         context,
       ).showSnackBar(SnackBar(content: Text('خطأ في إنشاء الصورة: $e')));
     }
@@ -188,25 +191,52 @@ class _PriceGeneratorScreenState extends State<PriceGeneratorScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('أدخل أسعار الأعلاف'),
-        backgroundColor: Colors.brown[300],
-      ),
+      appBar: const CustomAppBar(titleText: "أسعار المنتجات"),
       body: Padding(
-        padding: EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(kPrimaryPaddding),
         child: Column(
           children: [
-            // Date and Day input fields
+            Row(
+              children: [
+                Expanded(
+                  child: CustomElevatedButton(
+                    buttonText: "إنشاء قائمة الأسعار",
+                    onPressed: generateImage,
+                    backgroundColor: kCTAColor,
+                  ),
+                ),
+                const SizedBox(width: 8), // spacing between buttons
+                IconButton(
+                  onPressed: () {},
+                  icon: const Icon(Icons.delete),
+                  style: ButtonStyle(
+                    backgroundColor: WidgetStateProperty.all<Color>(
+                      kSecondaryColor,
+                    ),
+                    foregroundColor: WidgetStateProperty.all<Color>(kFontColor),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/*
+// Date and Day input fields
             Card(
-              margin: EdgeInsets.symmetric(vertical: 8.0),
+              margin: const EdgeInsets.symmetric(vertical: 8.0),
               child: Padding(
-                padding: EdgeInsets.all(16.0),
+                padding: const EdgeInsets.all(16.0),
                 child: Row(
                   children: [
                     Expanded(
                       child: TextField(
                         controller: dateController,
-                        decoration: InputDecoration(
+                        decoration: const InputDecoration(
                           labelText: 'التاريخ',
                           border: OutlineInputBorder(),
                           hintText: 'مثال: 2025/06/17',
@@ -214,11 +244,11 @@ class _PriceGeneratorScreenState extends State<PriceGeneratorScreen> {
                         textAlign: TextAlign.center,
                       ),
                     ),
-                    SizedBox(width: 16),
+                    const SizedBox(width: 16),
                     Expanded(
                       child: TextField(
                         controller: dayController,
-                        decoration: InputDecoration(
+                        decoration: const InputDecoration(
                           labelText: 'اليوم',
                           border: OutlineInputBorder(),
                           hintText: 'مثال: الثلاثاء',
@@ -232,24 +262,24 @@ class _PriceGeneratorScreenState extends State<PriceGeneratorScreen> {
             ),
             Expanded(
               child: ListView.builder(
-                itemCount: products.length,
+                itemCount: kProducts.length,
                 itemBuilder: (context, index) {
-                  final product = products[index];
+                  final product = kProducts[index];
                   return Card(
-                    margin: EdgeInsets.symmetric(vertical: 8.0),
+                    margin: const EdgeInsets.symmetric(vertical: 8.0),
                     child: Padding(
-                      padding: EdgeInsets.all(16.0),
+                      padding: const EdgeInsets.all(16.0),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
                             product.name,
-                            style: TextStyle(
+                            style: const TextStyle(
                               fontSize: 18,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
-                          SizedBox(height: 12),
+                          const SizedBox(height: 12),
                           Row(
                             children: [
                               if (product.has25kg) ...[
@@ -257,7 +287,7 @@ class _PriceGeneratorScreenState extends State<PriceGeneratorScreen> {
                                   child: TextField(
                                     controller:
                                         controllers[product.name]!['25kg'],
-                                    decoration: InputDecoration(
+                                    decoration: const InputDecoration(
                                       labelText: 'سعر عبوة ٢٥ كيلو',
                                       border: OutlineInputBorder(),
                                     ),
@@ -265,13 +295,13 @@ class _PriceGeneratorScreenState extends State<PriceGeneratorScreen> {
                                     textAlign: TextAlign.center,
                                   ),
                                 ),
-                                SizedBox(width: 8),
+                                const SizedBox(width: 8),
                               ],
                               Expanded(
                                 child: TextField(
                                   controller:
                                       controllers[product.name]!['50kg'],
-                                  decoration: InputDecoration(
+                                  decoration: const InputDecoration(
                                     labelText: 'سعر عبوة ٥٠ كيلو',
                                     border: OutlineInputBorder(),
                                   ),
@@ -279,11 +309,11 @@ class _PriceGeneratorScreenState extends State<PriceGeneratorScreen> {
                                   textAlign: TextAlign.center,
                                 ),
                               ),
-                              SizedBox(width: 8),
+                              const SizedBox(width: 8),
                               Expanded(
                                 child: TextField(
                                   controller: controllers[product.name]!['ton'],
-                                  decoration: InputDecoration(
+                                  decoration: const InputDecoration(
                                     labelText: 'سعر الطن',
                                     border: OutlineInputBorder(),
                                   ),
@@ -300,20 +330,4 @@ class _PriceGeneratorScreenState extends State<PriceGeneratorScreen> {
                 },
               ),
             ),
-            SizedBox(height: 16),
-            ElevatedButton(
-              onPressed: generateImage,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.brown[400],
-                foregroundColor: Colors.white,
-                padding: EdgeInsets.symmetric(horizontal: 32, vertical: 16),
-                textStyle: TextStyle(fontSize: 18),
-              ),
-              child: Text('إنشاء قائمة الأسعار'),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
+*/

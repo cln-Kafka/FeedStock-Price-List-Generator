@@ -1,3 +1,7 @@
+import 'package:feed_price_generator/constants.dart';
+import 'package:feed_price_generator/widgets/custom_app_bar.dart';
+import 'package:feed_price_generator/widgets/custom_elevated_button.dart';
+import 'package:feed_price_generator/widgets/image_preview.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -9,70 +13,60 @@ class ImageDisplayScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('قائمة الأسعار'),
-        backgroundColor: Colors.brown[300],
-        actions: [
-          IconButton(
-            icon: Icon(Icons.info_outline),
-            onPressed: () {
-              showDialog(
-                context: context,
-                builder: (BuildContext context) {
-                  return AlertDialog(
-                    title: Text('كيفية الحفظ'),
-                    content: Text(
-                      'لحفظ الصورة، قم بأخذ لقطة شاشة باستخدام أزرار الجهاز',
-                    ),
-                    actions: [
-                      TextButton(
-                        child: Text('موافق'),
-                        onPressed: () {
-                          Navigator.of(context).pop();
-                        },
-                      ),
-                    ],
-                  );
-                },
-              );
-            },
-          ),
-        ],
-      ),
-      body: Container(
-        width: double.infinity,
-        height: double.infinity,
-        color: Colors.white,
-        child: InteractiveViewer(
-          panEnabled: true,
-          scaleEnabled: true,
-          minScale: 0.5,
-          maxScale: 3.0,
-          child: Center(
-            child: Container(
-              margin: EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black26,
-                    blurRadius: 10,
-                    offset: Offset(0, 5),
-                  ),
-                ],
+      appBar: const CustomAppBar(titleText: "معاينة قائمة المنتجات"),
+      body: Padding(
+        padding: const EdgeInsets.all(kPrimaryPaddding),
+        child: Column(
+          children: [
+            Expanded(child: ImagePreview(imageBytes: imageBytes)),
+            const SizedBox(height: kSizedBoxBaseHeight - 4),
+            SizedBox(
+              width: double.infinity,
+              child: CustomElevatedButton(
+                buttonText: "حفظ في المعرض",
+                onPressed: () {},
+                backgroundColor: kCTAColor,
               ),
-              child: Image.memory(imageBytes, fit: BoxFit.contain),
             ),
-          ),
+            const SizedBox(height: kSizedBoxBaseHeight - 4),
+            SizedBox(
+              width: double.infinity,
+              child: CustomElevatedButton(
+                buttonText: "مشاركة",
+                onPressed: () {},
+              ),
+            ),
+            const SizedBox(height: kSizedBoxBaseHeight - 4),
+            SizedBox(
+              width: double.infinity,
+              child: CustomElevatedButton(
+                buttonText: "تعديل الأسعار",
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+              ),
+            ),
+          ],
         ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          Navigator.pop(context);
-        },
-        backgroundColor: Colors.brown[400],
-        tooltip: 'تعديل الأسعار',
-        child: Icon(Icons.edit, color: Colors.white),
       ),
     );
   }
 }
+
+
+/*
+AlertDialog(
+  title: const Text('كيفية الحفظ'),
+  content: const Text(
+    'لحفظ الصورة، قم بأخذ لقطة شاشة باستخدام أزرار الجهاز',
+  ),
+  actions: [
+    TextButton(
+      child: const Text('موافق'),
+      onPressed: () {
+        Navigator.of(context).pop();
+      },
+    ),
+  ],
+);
+*/

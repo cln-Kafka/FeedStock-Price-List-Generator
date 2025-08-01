@@ -1,12 +1,17 @@
 import 'package:feed_price_generator/constants.dart';
 import 'package:feed_price_generator/widgets/custom_app_bar.dart';
 import 'package:feed_price_generator/widgets/custom_elevated_button.dart';
-import 'package:feed_price_generator/widgets/day_date_confirmation_alert.dart';
-import 'package:feed_price_generator/widgets/product_card.dart';
+import 'package:feed_price_generator/widgets/product_price_input.dart';
+import 'package:feed_price_generator/models/product.dart';
+import 'package:feed_price_generator/cubits/product_list_cubit.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:uuid/uuid.dart';
 
 class PriceGeneratorView extends StatefulWidget {
-  const PriceGeneratorView({super.key});
+  final ProductList? existingProductList;
+
+  const PriceGeneratorView({super.key, this.existingProductList});
 
   static const String routeName = '/price-generator-view';
 
@@ -15,324 +20,238 @@ class PriceGeneratorView extends StatefulWidget {
 }
 
 class _PriceGeneratorViewState extends State<PriceGeneratorView> {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: const CustomAppBar(titleText: "أسعار المنتجات"),
-      body: Padding(
-        padding: const EdgeInsets.all(kPrimaryPaddding),
-        child: Column(
-          children: [
-            Expanded(
-              child: ListView.builder(
-                itemCount: kProducts.length,
-                itemBuilder: (context, index) {
-                  final product = kProducts[index];
-                  return ProductCard(productName: product.name);
-                },
-              ),
-            ),
-            Row(
-              children: [
-                Expanded(
-                  child: CustomElevatedButton(
-                    buttonText: "إنشاء قائمة الأسعار",
-                    onPressed: () {
-                      showDialog(
-                        context: context,
-                        builder: (BuildContext context) {
-                          return const DayDateConfirmationAlert();
-                        },
-                      );
-                    },
-                    backgroundColor: kCTAColor,
-                  ),
-                ),
-                const SizedBox(width: 8),
-                IconButton(
-                  onPressed: () {},
-                  icon: const Icon(Icons.delete),
-                  style: ButtonStyle(
-                    backgroundColor: WidgetStateProperty.all<Color>(
-                      kSecondaryColor,
-                    ),
-                    foregroundColor: WidgetStateProperty.all<Color>(kFontColor),
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-
-/*
-==================================================================
-=============================== UI ===============================
-==================================================================
-
-            // Date and Day input fields
-            Card(
-              margin: const EdgeInsets.symmetric(vertical: 8.0),
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: TextField(
-                        controller: dateController,
-                        decoration: const InputDecoration(
-                          labelText: 'التاريخ',
-                          border: OutlineInputBorder(),
-                          hintText: 'مثال: 2025/06/17',
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
-                    ),
-                    const SizedBox(width: 16),
-                    Expanded(
-                      child: TextField(
-                        controller: dayController,
-                        decoration: const InputDecoration(
-                          labelText: 'اليوم',
-                          border: OutlineInputBorder(),
-                          hintText: 'مثال: الثلاثاء',
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            Expanded(
-              child: ListView.builder(
-                itemCount: kProducts.length,
-                itemBuilder: (context, index) {
-                  final product = kProducts[index];
-                  return Card(
-                    margin: const EdgeInsets.symmetric(vertical: 8.0),
-                    child: Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            product.name,
-                            style: const TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          const SizedBox(height: 12),
-                          Row(
-                            children: [
-                              if (product.has25kg) ...[
-                                Expanded(
-                                  child: TextField(
-                                    controller:
-                                        controllers[product.name]!['25kg'],
-                                    decoration: const InputDecoration(
-                                      labelText: 'سعر عبوة ٢٥ كيلو',
-                                      border: OutlineInputBorder(),
-                                    ),
-                                    keyboardType: TextInputType.number,
-                                    textAlign: TextAlign.center,
-                                  ),
-                                ),
-                                const SizedBox(width: 8),
-                              ],
-                              Expanded(
-                                child: TextField(
-                                  controller:
-                                      controllers[product.name]!['50kg'],
-                                  decoration: const InputDecoration(
-                                    labelText: 'سعر عبوة ٥٠ كيلو',
-                                    border: OutlineInputBorder(),
-                                  ),
-                                  keyboardType: TextInputType.number,
-                                  textAlign: TextAlign.center,
-                                ),
-                              ),
-                              const SizedBox(width: 8),
-                              Expanded(
-                                child: TextField(
-                                  controller: controllers[product.name]!['ton'],
-                                  decoration: const InputDecoration(
-                                    labelText: 'سعر الطن',
-                                    border: OutlineInputBorder(),
-                                  ),
-                                  keyboardType: TextInputType.number,
-                                  textAlign: TextAlign.center,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                    ),
-                  );
-                },
-              ),
-            ),
-*/
-
-/*
-=================================================================
-============================= LOGIC =============================
-=================================================================
-
-Map<String, Map<String, TextEditingController>> controllers = {};
-  TextEditingController dateController = TextEditingController();
-  TextEditingController dayController = TextEditingController();
+  final TextEditingController _dateController = TextEditingController();
+  final TextEditingController _dayController = TextEditingController();
+  final Map<String, ProductPrice> _productPrices = {};
+  bool _isGenerating = false;
 
   @override
   void initState() {
     super.initState();
-    // Initialize controllers
-    for (var product in kProducts) {
-      controllers[product.name] = {};
-      if (product.has25kg) {
-        controllers[product.name]!['25kg'] = TextEditingController();
+    _initializeData();
+  }
+
+  void _initializeData() {
+    if (widget.existingProductList != null) {
+      _dateController.text = widget.existingProductList!.date;
+      _dayController.text = widget.existingProductList!.day;
+
+      for (final productPrice in widget.existingProductList!.products) {
+        _productPrices[productPrice.productName] = productPrice;
       }
-      controllers[product.name]!['50kg'] = TextEditingController();
-      controllers[product.name]!['ton'] = TextEditingController();
+    } else {
+      // Initialize with current date and day
+      final now = DateTime.now();
+      _dateController.text =
+          '${now.year}/${now.month.toString().padLeft(2, '0')}/${now.day.toString().padLeft(2, '0')}';
+
+      // Get Arabic day name
+      final days = [
+        'الأحد',
+        'الإثنين',
+        'الثلاثاء',
+        'الأربعاء',
+        'الخميس',
+        'الجمعة',
+        'السبت',
+      ];
+      _dayController.text = days[now.weekday % 7];
     }
   }
 
   @override
   void dispose() {
-    // Dispose controllers
-    for (var productControllers in controllers.values) {
-      for (var controller in productControllers.values) {
-        controller.dispose();
-      }
-    }
-    dateController.dispose();
-    dayController.dispose();
+    _dateController.dispose();
+    _dayController.dispose();
     super.dispose();
   }
 
-  Future<void> generateImage() async {
-    try {
-      // Load the template image from assets
-      final ByteData data = await rootBundle.load(
-        'assets/images/template.jpeg',
-      );
-      final ui.Codec codec = await ui.instantiateImageCodec(
-        data.buffer.asUint8List(),
-      );
-      final ui.FrameInfo frameInfo = await codec.getNextFrame();
-      final ui.Image templateImage = frameInfo.image;
-
-      // Create a canvas to draw on
-      final recorder = ui.PictureRecorder();
-      final canvas = Canvas(recorder);
-
-      // Draw the template image
-      canvas.drawImage(templateImage, Offset.zero, Paint());
-
-      // Set up text style for prices
-      const textStyle = TextStyle(
-        color: Colors.brown,
-        fontSize: 32,
-        fontWeight: FontWeight.bold,
-      );
-
-      // Draw date and day
-      if (dateController.text.isNotEmpty) {
-        _drawText(
-          canvas,
-          dateController.text,
-          const Offset(kDateX, kDateY),
-          textStyle,
-        );
-      }
-      if (dayController.text.isNotEmpty) {
-        _drawText(
-          canvas,
-          dayController.text,
-          const Offset(kDayX, kDayY),
-          textStyle,
-        );
-      }
-
-      // Draw prices on the image
-      for (int i = 0; i < kProducts.length; i++) {
-        final product = kProducts[i];
-        final y = kRowPositions[i];
-
-        // Draw 25kg price (if product has it)
-        if (product.has25kg &&
-            controllers[product.name]!['25kg']!.text.isNotEmpty) {
-          _drawText(
-            canvas,
-            controllers[product.name]!['25kg']!.text,
-            Offset(kColumnPositions[0], y),
-            textStyle,
-          );
-        }
-
-        // Draw 50kg price
-        if (controllers[product.name]!['50kg']!.text.isNotEmpty) {
-          _drawText(
-            canvas,
-            controllers[product.name]!['50kg']!.text,
-            Offset(kColumnPositions[1], y),
-            textStyle,
-          );
-        }
-
-        // Draw ton price
-        if (controllers[product.name]!['ton']!.text.isNotEmpty) {
-          _drawText(
-            canvas,
-            controllers[product.name]!['ton']!.text,
-            Offset(kColumnPositions[2], y),
-            textStyle,
-          );
-        }
-      }
-
-      // Convert to image
-      final picture = recorder.endRecording();
-      final img = await picture.toImage(
-        templateImage.width,
-        templateImage.height,
-      );
-      final ByteData? pngBytes = await img.toByteData(
-        format: ui.ImageByteFormat.png,
-      );
-
-      if (pngBytes != null) {
-        // Navigate to image display screen
-        Navigator.push(
-          // ignore: use_build_context_synchronously
-          context,
-          MaterialPageRoute(
-            builder: (context) =>
-                ImageDisplayView(imageBytes: pngBytes.buffer.asUint8List()),
-          ),
-        );
-      }
-    } catch (e) {
-      ScaffoldMessenger.of(
-        // ignore: use_build_context_synchronously
-        context,
-      ).showSnackBar(SnackBar(content: Text('خطأ في إنشاء الصورة: $e')));
-    }
+  void _onPriceChanged(ProductPrice productPrice) {
+    setState(() {
+      _productPrices[productPrice.productName] = productPrice;
+    });
   }
 
-  void _drawText(Canvas canvas, String text, Offset position, TextStyle style) {
-    final textSpan = TextSpan(text: text, style: style);
-    final textPainter = TextPainter(
-      text: textSpan,
-      textDirection: TextDirection.rtl,
+  void _resetAllFields() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('تأكيد'),
+          content: const Text('هل أنت متأكد من أنك تريد مسح جميع البيانات؟'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text('إلغاء'),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+                setState(() {
+                  _productPrices.clear();
+                  _dateController.clear();
+                  _dayController.clear();
+                  _initializeData();
+                });
+              },
+              child: const Text('تأكيد'),
+            ),
+          ],
+        );
+      },
     );
-    textPainter.layout();
-    textPainter.paint(canvas, position);
   }
-*/
+
+  void _generatePriceList() {
+    if (_dateController.text.isEmpty || _dayController.text.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('يرجى إدخال التاريخ واليوم')),
+      );
+      return;
+    }
+
+    if (_productPrices.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('يرجى إدخال أسعار المنتجات')),
+      );
+      return;
+    }
+
+    setState(() {
+      _isGenerating = true;
+    });
+
+    final productList = ProductList(
+      id: widget.existingProductList?.id ?? const Uuid().v4(),
+      date: _dateController.text,
+      day: _dayController.text,
+      products: _productPrices.values.toList(),
+      createdAt: DateTime.now(),
+    );
+
+    context.read<ProductListCubit>().generateImage(productList);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: const CustomAppBar(titleText: "أسعار المنتجات"),
+      body: BlocListener<ProductListCubit, ProductListState>(
+        listener: (context, state) {
+          if (state is ImageGenerated) {
+            setState(() {
+              _isGenerating = false;
+            });
+
+            // Save the product list
+            context.read<ProductListCubit>().saveProductList(state.productList);
+
+            // Navigate to image display
+            Navigator.pushNamed(
+              context,
+              '/image-display-view',
+              arguments: {
+                'imageBytes': state.imageBytes,
+                'productList': state.productList,
+              },
+            );
+          } else if (state is ImageGenerationError) {
+            setState(() {
+              _isGenerating = false;
+            });
+            ScaffoldMessenger.of(
+              context,
+            ).showSnackBar(SnackBar(content: Text(state.message)));
+          }
+        },
+        child: Padding(
+          padding: const EdgeInsets.all(kPrimaryPaddding),
+          child: Column(
+            children: [
+              // Date and Day input fields
+              Card(
+                margin: const EdgeInsets.symmetric(vertical: 8.0),
+                color: kSecondaryColor,
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: TextField(
+                          controller: _dateController,
+                          decoration: const InputDecoration(
+                            labelText: 'التاريخ',
+                            border: OutlineInputBorder(),
+                            hintText: 'مثال: 2025/06/17',
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                      const SizedBox(width: 16),
+                      Expanded(
+                        child: TextField(
+                          controller: _dayController,
+                          decoration: const InputDecoration(
+                            labelText: 'اليوم',
+                            border: OutlineInputBorder(),
+                            hintText: 'مثال: الثلاثاء',
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+
+              // Product price inputs
+              Expanded(
+                child: ListView.builder(
+                  itemCount: kProducts.length,
+                  itemBuilder: (context, index) {
+                    final product = kProducts[index];
+                    final initialPrice = _productPrices[product.name];
+
+                    return ProductPriceInput(
+                      product: product,
+                      initialPrice: initialPrice,
+                      onPriceChanged: _onPriceChanged,
+                    );
+                  },
+                ),
+              ),
+
+              // Action buttons
+              Row(
+                children: [
+                  Expanded(
+                    child: CustomElevatedButton(
+                      buttonText: _isGenerating
+                          ? "جاري الإنشاء..."
+                          : "إنشاء قائمة الأسعار",
+                      onPressed: _isGenerating ? null : _generatePriceList,
+                      backgroundColor: kCTAColor,
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  IconButton(
+                    onPressed: _resetAllFields,
+                    icon: const Icon(Icons.delete),
+                    style: ButtonStyle(
+                      backgroundColor: WidgetStateProperty.all<Color>(
+                        kSecondaryColor,
+                      ),
+                      foregroundColor: WidgetStateProperty.all<Color>(
+                        kFontColor,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}

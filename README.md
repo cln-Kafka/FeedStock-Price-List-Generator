@@ -8,7 +8,7 @@ A mobile application designed for animal feed store owners to create and share p
 
 | Home Screen | Price Input Screen | Image Preview Screen |
 |-------------|----------------|---------------|
-| ![Home](READEME-assets/screenshots/home.png) | ![Feature](READEME-assets/screenshots/price_input.png) | ![Detail](READEME-assets/screenshots/image_preview.png) |
+| ![Home Screen](READEME-assets/screenshots/home.png) | ![Price Input Screen](READEME-assets/screenshots/price_input.png) | ![Image Preview Screen](READEME-assets/screenshots/image_preview.png) |
 
 </div>
 

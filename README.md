@@ -8,7 +8,7 @@ A mobile application designed for animal feed store owners to create and share p
 
 | Home Screen | Price Input Screen | Image Preview Screen |
 |-------------|----------------|---------------|
-| ![Home Screen](READEME-assets/screenshots/home.png) | ![Price Input Screen](READEME-assets/screenshots/price_input.png) | ![Image Preview Screen](READEME-assets/screenshots/image_preview.png) |
+| ![Home Screen](README-assets/screenshots/home.png) | ![Price Input Screen](README-assets/screenshots/price_input.png) | ![Image Preview Screen](README-assets/screenshots/image_preview.png) |
 
 </div>
 
@@ -20,12 +20,15 @@ A mobile application designed for animal feed store owners to create and share p
 - ✅ **Social Media Integration using share_plus** - Share images across platforms including Facebook, WhatsApp, and Telegram
 - ✅ **Smart Caching using Hive** - Stores up to 20 previous price lists with the ability to modify existing ones instead of starting from scratch
 
+<!--
 ## Installation
 
 You can install the Android APK directly on your device: [Download FeedStock APK](READEME-Assets/built-app/الحنش-للأعلاف.apk)
 
 > [!NOTE]
 > Android only - iOS version not currently available
+
+-->
 
 ## Development Journey & Learning Process
 

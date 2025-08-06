@@ -7,6 +7,7 @@ import 'package:feed_price_generator/core/themes/main_app_theme.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 
 void main() {
   runApp(const FeedStock());
@@ -23,6 +24,15 @@ class FeedStock extends StatelessWidget {
         title: 'أسعار الأعلاف',
         debugShowCheckedModeBanner: false,
         theme: MainAppTheme.lightTheme,
+        localizationsDelegates: const [
+          GlobalMaterialLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+        ],
+        supportedLocales: const [
+          Locale('ar', 'EG'), // Arabic (Egypt)
+          Locale('en', 'US'), // English (US)
+        ],
         locale: const Locale('ar', 'EG'),
         builder: (context, child) {
           return Directionality(

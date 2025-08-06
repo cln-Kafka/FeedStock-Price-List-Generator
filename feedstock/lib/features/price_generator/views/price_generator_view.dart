@@ -1,9 +1,11 @@
 import 'package:feed_price_generator/constants.dart';
 import 'package:feed_price_generator/models/product_list.dart';
 import 'package:feed_price_generator/core/widgets/custom_app_bar.dart';
-import 'package:feed_price_generator/core/widgets/custom_elevated_button.dart';
-import 'package:feed_price_generator/features/price_generator/widgets/product_price_input.dart';
 import 'package:feed_price_generator/cubits/product_list_cubit.dart';
+import 'package:feed_price_generator/features/price_generator/widgets/date_day_selector.dart';
+import 'package:feed_price_generator/features/price_generator/widgets/action_buttons.dart';
+import 'package:feed_price_generator/features/price_generator/widgets/product_list_section.dart';
+import 'package:feed_price_generator/features/price_generator/services/price_generator_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:uuid/uuid.dart';
@@ -21,8 +23,7 @@ class PriceGeneratorView extends StatefulWidget {
 }
 
 class _PriceGeneratorViewState extends State<PriceGeneratorView> {
-  final TextEditingController _dateController = TextEditingController();
-  final TextEditingController _dayController = TextEditingController();
+  DateTime _selectedDate = DateTime.now();
   final Map<String, ProductPrice> _productPrices = {};
   bool _isGenerating = false;
 
@@ -34,36 +35,20 @@ class _PriceGeneratorViewState extends State<PriceGeneratorView> {
 
   void _initializeData() {
     if (widget.existingProductList != null) {
-      _dateController.text = widget.existingProductList!.date;
-      _dayController.text = widget.existingProductList!.day;
+      _selectedDate = PriceGeneratorService.parseDateFromString(
+        widget.existingProductList!.date,
+      );
 
       for (final productPrice in widget.existingProductList!.products) {
         _productPrices[productPrice.productName] = productPrice;
       }
     } else {
-      // Initialize with current date and day
-      final now = DateTime.now();
-      _dateController.text =
-          '${now.year}/${now.month.toString().padLeft(2, '0')}/${now.day.toString().padLeft(2, '0')}';
-
-      // Get Arabic day name
-      final days = [
-        'الأحد',
-        'الإثنين',
-        'الثلاثاء',
-        'الأربعاء',
-        'الخميس',
-        'الجمعة',
-        'السبت',
-      ];
-      _dayController.text = days[now.weekday % 7];
+      _selectedDate = DateTime.now();
     }
   }
 
   @override
   void dispose() {
-    _dateController.dispose();
-    _dayController.dispose();
     super.dispose();
   }
 
@@ -90,9 +75,7 @@ class _PriceGeneratorViewState extends State<PriceGeneratorView> {
                 Navigator.pop(context);
                 setState(() {
                   _productPrices.clear();
-                  _dateController.clear();
-                  _dayController.clear();
-                  _initializeData();
+                  _selectedDate = DateTime.now();
                 });
               },
               child: const Text('تأكيد'),
@@ -104,14 +87,7 @@ class _PriceGeneratorViewState extends State<PriceGeneratorView> {
   }
 
   void _generatePriceList() {
-    if (_dateController.text.isEmpty || _dayController.text.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('يرجى إدخال التاريخ واليوم')),
-      );
-      return;
-    }
-
-    if (_productPrices.isEmpty) {
+    if (!PriceGeneratorService.validateProductPrices(_productPrices)) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('يرجى إدخال أسعار المنتجات')),
       );
@@ -122,11 +98,10 @@ class _PriceGeneratorViewState extends State<PriceGeneratorView> {
       _isGenerating = true;
     });
 
-    final productList = ProductList(
+    final productList = PriceGeneratorService.createProductList(
       id: widget.existingProductList?.id ?? const Uuid().v4(),
-      date: _dateController.text,
-      day: _dayController.text,
-      products: _productPrices.values.toList(),
+      selectedDate: _selectedDate,
+      productPrices: _productPrices,
       createdAt: DateTime.now(),
     );
 
@@ -173,85 +148,27 @@ class _PriceGeneratorViewState extends State<PriceGeneratorView> {
           ),
           child: Column(
             children: [
-              // Date and Day input fields
-              Card(
-                margin: const EdgeInsets.symmetric(vertical: 8.0),
-                color: kSecondaryColor,
-                child: Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: TextField(
-                          controller: _dateController,
-                          decoration: const InputDecoration(
-                            labelText: 'التاريخ',
-                            border: OutlineInputBorder(),
-                            hintText: 'مثال: 2025/06/17',
-                          ),
-                          textAlign: TextAlign.center,
-                        ),
-                      ),
-                      const SizedBox(width: 16),
-                      Expanded(
-                        child: TextField(
-                          controller: _dayController,
-                          decoration: const InputDecoration(
-                            labelText: 'اليوم',
-                            border: OutlineInputBorder(),
-                            hintText: 'مثال: الثلاثاء',
-                          ),
-                          textAlign: TextAlign.center,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
+              // Date and Day selector
+              DateDaySelector(
+                selectedDate: _selectedDate,
+                onDateChanged: (date) {
+                  setState(() {
+                    _selectedDate = date;
+                  });
+                },
               ),
 
-              // Product price inputs
-              Expanded(
-                child: ListView.builder(
-                  itemCount: kProducts.length,
-                  itemBuilder: (context, index) {
-                    final product = kProducts[index];
-                    final initialPrice = _productPrices[product.name];
-
-                    return ProductPriceInput(
-                      product: product,
-                      initialPrice: initialPrice,
-                      onPriceChanged: _onPriceChanged,
-                    );
-                  },
-                ),
+              // Product list section
+              ProductListSection(
+                productPrices: _productPrices,
+                onPriceChanged: _onPriceChanged,
               ),
 
               // Action buttons
-              Row(
-                children: [
-                  Expanded(
-                    child: CustomElevatedButton(
-                      buttonText: _isGenerating
-                          ? "جاري الإنشاء..."
-                          : "إنشاء قائمة الأسعار",
-                      onPressed: _isGenerating ? null : _generatePriceList,
-                      backgroundColor: kCTAColor,
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  IconButton(
-                    onPressed: _resetAllFields,
-                    icon: const Icon(Icons.delete),
-                    style: ButtonStyle(
-                      backgroundColor: WidgetStateProperty.all<Color>(
-                        kSecondaryColor,
-                      ),
-                      foregroundColor: WidgetStateProperty.all<Color>(
-                        kFontColor,
-                      ),
-                    ),
-                  ),
-                ],
+              ActionButtons(
+                isGenerating: _isGenerating,
+                onGeneratePressed: _generatePriceList,
+                onResetPressed: _resetAllFields,
               ),
             ],
           ),

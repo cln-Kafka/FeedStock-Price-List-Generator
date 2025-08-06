@@ -422,4 +422,12 @@ class MainAppTheme {
       ),
     );
   }
+
+  // Dark Theme (if needed in the future)
+  static ThemeData get darkTheme {
+    return ThemeData(
+      brightness: Brightness.dark,
+      // Add dark theme properties here when needed
+    );
+  }
 }

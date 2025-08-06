@@ -41,8 +41,9 @@ class ProductListCubit extends Cubit<ProductListState> {
 
   Future<void> generateImage(ProductList productList) async {
     try {
-      final svgContent = SvgGeneratorService.generatePriceListSvg(productList);
-      final imageBytes = await SvgGeneratorService.svgToPngBytes(svgContent, productList);
+      final imageBytes = await SvgGeneratorService.generatePriceListImage(
+        productList,
+      );
       emit(ImageGenerated(imageBytes, productList));
     } catch (e) {
       emit(ImageGenerationError('Failed to generate image: $e'));

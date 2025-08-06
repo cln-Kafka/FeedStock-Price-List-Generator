@@ -32,7 +32,7 @@ const double kCardMargin = 16.0;
 const String kFontFamily = 'SpaceGrotesk';
 const kBaseFontSize = 16.0;
 
-// In case of overlaying new prices on a template image
+// In case of overlaying new prices on a template image [old approach]
 const List<double> kRowPositions = [
   475,
   535,

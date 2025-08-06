@@ -1,12 +1,13 @@
 import 'package:feed_price_generator/constants.dart';
-import 'package:feed_price_generator/widgets/custom_app_bar.dart';
-import 'package:feed_price_generator/widgets/custom_elevated_button.dart';
-import 'package:feed_price_generator/widgets/product_price_input.dart';
-import 'package:feed_price_generator/models/product.dart';
+import 'package:feed_price_generator/models/product_list.dart';
+import 'package:feed_price_generator/core/widgets/custom_app_bar.dart';
+import 'package:feed_price_generator/core/widgets/custom_elevated_button.dart';
+import 'package:feed_price_generator/features/price_generator/widgets/product_price_input.dart';
 import 'package:feed_price_generator/cubits/product_list_cubit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:uuid/uuid.dart';
+import 'package:feed_price_generator/models/product_price.dart';
 
 class PriceGeneratorView extends StatefulWidget {
   final ProductList? existingProductList;

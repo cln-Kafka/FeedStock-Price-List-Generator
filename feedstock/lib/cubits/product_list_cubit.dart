@@ -1,93 +1,13 @@
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:equatable/equatable.dart';
-import 'package:feed_price_generator/models/product.dart';
-import 'package:feed_price_generator/services/storage_service.dart';
-import 'package:feed_price_generator/services/svg_generator_service.dart';
 import 'dart:typed_data';
 
-// Events
-abstract class ProductListEvent extends Equatable {
-  @override
-  List<Object?> get props => [];
-}
+import 'package:equatable/equatable.dart';
+import 'package:feed_price_generator/models/product_list.dart';
+import 'package:feed_price_generator/core/services/storage_service.dart';
+import 'package:feed_price_generator/core/services/svg_generator_service.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
-class LoadProductLists extends ProductListEvent {}
+part 'product_list_state.dart';
 
-class SaveProductList extends ProductListEvent {
-  final ProductList productList;
-
-  SaveProductList(this.productList);
-
-  @override
-  List<Object?> get props => [productList];
-}
-
-class DeleteProductList extends ProductListEvent {
-  final String id;
-
-  DeleteProductList(this.id);
-
-  @override
-  List<Object?> get props => [id];
-}
-
-class GenerateImage extends ProductListEvent {
-  final ProductList productList;
-
-  GenerateImage(this.productList);
-
-  @override
-  List<Object?> get props => [productList];
-}
-
-// States
-abstract class ProductListState extends Equatable {
-  @override
-  List<Object?> get props => [];
-}
-
-class ProductListInitial extends ProductListState {}
-
-class ProductListLoading extends ProductListState {}
-
-class ProductListLoaded extends ProductListState {
-  final List<ProductList> productLists;
-
-  ProductListLoaded(this.productLists);
-
-  @override
-  List<Object?> get props => [productLists];
-}
-
-class ProductListError extends ProductListState {
-  final String message;
-
-  ProductListError(this.message);
-
-  @override
-  List<Object?> get props => [message];
-}
-
-class ImageGenerated extends ProductListState {
-  final Uint8List imageBytes;
-  final ProductList productList;
-
-  ImageGenerated(this.imageBytes, this.productList);
-
-  @override
-  List<Object?> get props => [imageBytes, productList];
-}
-
-class ImageGenerationError extends ProductListState {
-  final String message;
-
-  ImageGenerationError(this.message);
-
-  @override
-  List<Object?> get props => [message];
-}
-
-// Cubit
 class ProductListCubit extends Cubit<ProductListState> {
   ProductListCubit() : super(ProductListInitial());
 

@@ -1,17 +1,15 @@
 import 'package:feed_price_generator/constants.dart';
-import 'package:feed_price_generator/views/home_view.dart';
-import 'package:feed_price_generator/views/price_generator_view.dart';
-import 'package:feed_price_generator/views/image_display_view.dart';
+import 'package:feed_price_generator/models/product_list.dart';
+import 'package:feed_price_generator/features/home/views/home_view.dart';
+import 'package:feed_price_generator/features/price_generator/views/price_generator_view.dart';
+import 'package:feed_price_generator/features/image_preview/views/image_display_view.dart';
 import 'package:feed_price_generator/cubits/product_list_cubit.dart';
-import 'package:feed_price_generator/models/product.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 void main() {
-  runApp(
-    const FeedStock(),
-  );
+  runApp(const FeedStock());
 }
 
 class FeedStock extends StatelessWidget {

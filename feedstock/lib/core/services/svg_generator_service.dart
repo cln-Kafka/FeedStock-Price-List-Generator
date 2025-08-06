@@ -1,7 +1,7 @@
 import 'dart:typed_data';
 import 'dart:ui' as ui;
+import 'package:feed_price_generator/models/product_list.dart';
 import 'package:flutter/services.dart';
-import 'package:feed_price_generator/models/product.dart';
 
 class SvgGeneratorService {
   static String generatePriceListSvg(ProductList productList) {

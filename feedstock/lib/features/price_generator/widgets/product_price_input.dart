@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:feed_price_generator/constants.dart';
 import 'package:feed_price_generator/models/product.dart';
+import 'package:feed_price_generator/models/product_price.dart';
 
 class ProductPriceInput extends StatefulWidget {
   final Product product;

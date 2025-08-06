@@ -1,9 +1,9 @@
 import 'package:feed_price_generator/constants.dart';
-import 'package:feed_price_generator/widgets/custom_app_bar.dart';
-import 'package:feed_price_generator/widgets/custom_elevated_button.dart';
-import 'package:feed_price_generator/widgets/image_preview.dart';
-import 'package:feed_price_generator/models/product.dart';
-import 'package:feed_price_generator/views/price_generator_view.dart';
+import 'package:feed_price_generator/models/product_list.dart';
+import 'package:feed_price_generator/core/widgets/custom_app_bar.dart';
+import 'package:feed_price_generator/core/widgets/custom_elevated_button.dart';
+import 'package:feed_price_generator/features/image_preview/widgets/image_preview.dart';
+import 'package:feed_price_generator/features/price_generator/views/price_generator_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:share_plus/share_plus.dart';
@@ -37,8 +37,24 @@ class _ImageDisplayViewState extends State<ImageDisplayView> {
     });
 
     try {
-      // Request storage permission
-      final status = await Permission.storage.request();
+      // Request appropriate permission based on Android version
+      PermissionStatus status;
+
+      // For Android 13+ (API 33+), use photos permission
+      // For older versions, use storage permission
+      if (Platform.isAndroid) {
+        // Try photos permission first (Android 13+)
+        status = await Permission.photos.request();
+
+        // If photos permission is not available (older Android), fall back to storage
+        if (status.isPermanentlyDenied || status.isDenied) {
+          status = await Permission.storage.request();
+        }
+      } else {
+        // For non-Android platforms, use storage permission
+        status = await Permission.storage.request();
+      }
+
       if (!status.isGranted) {
         // ignore: use_build_context_synchronously
         ScaffoldMessenger.of(context).showSnackBar(

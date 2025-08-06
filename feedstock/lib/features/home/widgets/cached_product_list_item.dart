@@ -1,6 +1,6 @@
+import 'package:feed_price_generator/models/product_list.dart';
 import 'package:flutter/material.dart';
 import 'package:feed_price_generator/constants.dart';
-import 'package:feed_price_generator/models/product.dart';
 import 'package:intl/intl.dart';
 
 class CachedProductListItem extends StatelessWidget {

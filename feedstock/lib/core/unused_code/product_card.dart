@@ -1,5 +1,5 @@
 import 'package:feed_price_generator/constants.dart';
-import 'package:feed_price_generator/widgets/pack_row.dart';
+import 'package:feed_price_generator/core/unused_code/pack_row.dart';
 import 'package:flutter/material.dart';
 
 class ProductCard extends StatelessWidget {

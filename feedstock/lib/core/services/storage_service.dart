@@ -1,7 +1,7 @@
 import 'dart:convert';
+import 'package:feed_price_generator/models/product_list.dart';
 import 'package:path_provider/path_provider.dart';
 import 'dart:io';
-import 'package:feed_price_generator/models/product.dart';
 
 class StorageService {
   static const String _fileName = 'product_lists.json';

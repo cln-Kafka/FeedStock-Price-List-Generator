@@ -50,12 +50,12 @@ class _HomeViewState extends State<HomeView> {
           content: const Text('هل أنت متأكد من أنك تريد حذف هذه القائمة؟'),
           actions: [
             TextButton(
-              onPressed: () => Navigator.of(context).pop(),
+              onPressed: () => Navigator.pop(context),
               child: const Text('إلغاء'),
             ),
             TextButton(
               onPressed: () {
-                Navigator.of(context).pop();
+                Navigator.pop(context);
                 context.read<ProductListCubit>().deleteProductList(id);
               },
               child: const Text('حذف'),

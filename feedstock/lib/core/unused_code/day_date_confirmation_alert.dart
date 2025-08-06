@@ -53,7 +53,8 @@ class DayDateConfirmationAlert extends StatelessWidget {
         TextButton(
           child: const Text('موافق'),
           onPressed: () {
-            Navigator.of(context).pop();
+            Navigator.pop(context);
+            ;
           },
         ),
       ],

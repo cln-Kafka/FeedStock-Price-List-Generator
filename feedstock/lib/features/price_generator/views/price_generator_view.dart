@@ -82,12 +82,12 @@ class _PriceGeneratorViewState extends State<PriceGeneratorView> {
           content: const Text('هل أنت متأكد من أنك تريد مسح جميع البيانات؟'),
           actions: [
             TextButton(
-              onPressed: () => Navigator.of(context).pop(),
+              onPressed: () => Navigator.pop(context),
               child: const Text('إلغاء'),
             ),
             TextButton(
               onPressed: () {
-                Navigator.of(context).pop();
+                Navigator.pop(context);
                 setState(() {
                   _productPrices.clear();
                   _dateController.clear();
@@ -166,7 +166,11 @@ class _PriceGeneratorViewState extends State<PriceGeneratorView> {
           }
         },
         child: Padding(
-          padding: const EdgeInsets.all(kPrimaryPaddding),
+          padding: const EdgeInsets.only(
+            left: kPrimaryPaddding,
+            right: kPrimaryPaddding,
+            bottom: kPrimaryPaddding,
+          ),
           child: Column(
             children: [
               // Date and Day input fields

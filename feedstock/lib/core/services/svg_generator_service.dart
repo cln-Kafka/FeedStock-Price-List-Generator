@@ -99,63 +99,95 @@ class SvgGeneratorService {
     return svgContent;
   }
 
-  static Future<Uint8List> svgToPngBytes(String svgContent) async {
-    // Create a simple colored image as a placeholder
-    // This will be replaced with proper SVG to PNG conversion in the future
+  // Simplified method that recreates the design using Canvas directly
+  static Future<Uint8List> svgToPngBytes(String svgContent, ProductList productList) async {
+    const double width = 800;
+    const double height = 1200;
+    const double headerHeight = 200;
+    const double rowHeight = 80;
+    const double tableStartY = 250;
 
-    const int width = 800;
-    const int height = 1200;
+    try {
+      // Create a picture recorder
+      final ui.PictureRecorder recorder = ui.PictureRecorder();
+      final ui.Canvas canvas = ui.Canvas(recorder);
 
-    // Create a picture recorder
-    final ui.PictureRecorder recorder = ui.PictureRecorder();
-    final ui.Canvas canvas = ui.Canvas(recorder);
+      // Background
+      canvas.drawColor(const ui.Color(0xFFFCFAF7), ui.BlendMode.src);
 
-    // Set background color
-    canvas.drawColor(const ui.Color(0xFFFCFAF7), ui.BlendMode.src);
+      // Header
+      final ui.Paint headerPaint = ui.Paint()..color = const ui.Color(0xFFF49E0A);
+      canvas.drawRect(ui.Rect.fromLTWH(0, 0, width, headerHeight), headerPaint);
 
-    // Draw header
-    final ui.Paint headerPaint = ui.Paint()..color = const ui.Color(0xFFF49E0A);
-    canvas.drawRect(ui.Rect.fromLTWH(0, 0, width.toDouble(), 200), headerPaint);
+      // Logo placeholder (circle)
+      final ui.Paint logoPaint = ui.Paint()
+        ..color = const ui.Color(0x4DFFFFFF) // 30% opacity white
+        ..style = ui.PaintingStyle.fill;
+      canvas.drawCircle(const ui.Offset(100, 100), 50, logoPaint);
 
-    // Draw a simple table placeholder
-    final ui.Paint tablePaint = ui.Paint()
-      ..color = const ui.Color(0xFFF5F0E8)
-      ..style = ui.PaintingStyle.fill;
+      // Table header background
+      final ui.Paint tableHeaderPaint = ui.Paint()..color = const ui.Color(0xFFF5F0E8);
+      canvas.drawRect(ui.Rect.fromLTWH(50, tableStartY, width - 100, 60), tableHeaderPaint);
 
-    canvas.drawRect(ui.Rect.fromLTWH(50, 250, width - 100, 400), tablePaint);
+      // Table header border
+      final ui.Paint borderPaint = ui.Paint()
+        ..color = const ui.Color(0xFF9E7D47)
+        ..style = ui.PaintingStyle.stroke
+        ..strokeWidth = 2;
+      canvas.drawRect(ui.Rect.fromLTWH(50, tableStartY, width - 100, 60), borderPaint);
 
-    // Draw table border
-    final ui.Paint borderPaint = ui.Paint()
-      ..color = const ui.Color(0xFF9E7D47)
-      ..style = ui.PaintingStyle.stroke
-      ..strokeWidth = 2;
+      // Product rows
+      for (int i = 0; i < productList.products.length; i++) {
+        final rowY = tableStartY + 60 + (i * rowHeight);
+        
+        // Row background
+        final ui.Paint rowPaint = ui.Paint()
+          ..color = i % 2 == 0 ? const ui.Color(0xFFFFFFFF) : const ui.Color(0xFFF5F0E8);
+        canvas.drawRect(ui.Rect.fromLTWH(50, rowY, width - 100, rowHeight), rowPaint);
 
-    canvas.drawRect(ui.Rect.fromLTWH(50, 250, width - 100, 400), borderPaint);
+        // Row border
+        final ui.Paint rowBorderPaint = ui.Paint()
+          ..color = const ui.Color(0xFF9E7D47)
+          ..style = ui.PaintingStyle.stroke
+          ..strokeWidth = 1;
+        canvas.drawRect(ui.Rect.fromLTWH(50, rowY, width - 100, rowHeight), rowBorderPaint);
+      }
 
-    // Draw some simple rectangles to represent content
-    final ui.Paint contentPaint = ui.Paint()
-      ..color = const ui.Color(0xFF1C170D)
-      ..style = ui.PaintingStyle.fill;
+      // Note: Text rendering in Flutter Canvas requires more complex setup with TextPainter
+      // For now, this creates the basic structure. You might want to use a widget-based approach
+      // for text rendering if you need the Arabic text to display properly.
 
-    // Draw some placeholder rectangles for text
-    for (int i = 0; i < 8; i++) {
-      canvas.drawRect(
-        ui.Rect.fromLTWH(100, 300 + (i * 50), 600, 30),
-        contentPaint,
-      );
+      // Convert to image
+      final ui.Picture picture = recorder.endRecording();
+      final ui.Image image = await picture.toImage(width.toInt(), height.toInt());
+      final ByteData? byteData = await image.toByteData(format: ui.ImageByteFormat.png);
+
+      if (byteData != null) {
+        return byteData.buffer.asUint8List();
+      } else {
+        throw Exception('Failed to generate image');
+      }
+    } catch (e) {
+      throw Exception('Error generating PNG: $e');
     }
+  }
 
-    // End recording and convert to image
-    final ui.Picture picture = recorder.endRecording();
-    final ui.Image image = await picture.toImage(width, height);
-    final ByteData? byteData = await image.toByteData(
-      format: ui.ImageByteFormat.png,
-    );
-
-    if (byteData != null) {
-      return byteData.buffer.asUint8List();
-    } else {
-      throw Exception('Failed to generate image');
-    }
+  // Alternative: Widget-based approach (recommended for complex layouts with text)
+  static Future<Uint8List> generatePriceListImage(ProductList productList) async {
+    // This approach would create a Flutter widget that renders your price list
+    // and then convert that widget to an image using RepaintBoundary
+    // This is more reliable for Arabic text and complex layouts
+    
+    // You would need to create a Widget that matches your SVG design
+    // Then use something like this:
+    /*
+    final RenderRepaintBoundary boundary = globalKey.currentContext!
+        .findRenderObject()! as RenderRepaintBoundary;
+    final ui.Image image = await boundary.toImage(pixelRatio: 2.0);
+    final ByteData? byteData = await image.toByteData(format: ui.ImageByteFormat.png);
+    return byteData!.buffer.asUint8List();
+    */
+    
+    throw UnimplementedError('Implement widget-based rendering for better text support');
   }
 }

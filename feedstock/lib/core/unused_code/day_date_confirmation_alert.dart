@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
@@ -41,7 +43,7 @@ class DayDateConfirmationAlert extends StatelessWidget {
               String formattedDate = DateFormat(
                 'dd/MM/yyyy, EEEE',
               ).format(DateTime.now());
-              debugPrint(formattedDate); // e.g., 31/07/2025, Thursday
+              log(formattedDate); // e.g., 31/07/2025, Thursday
             },
             child: const Text('استعمل تاريخ اليوم والوقت الحالي!'),
           ),

@@ -1,4 +1,6 @@
 import 'package:feed_price_generator/constants.dart';
+import 'package:feed_price_generator/core/utils/snack_bar.dart';
+import 'package:feed_price_generator/features/home/views/home_view.dart';
 import 'package:feed_price_generator/models/product_list.dart';
 import 'package:feed_price_generator/core/widgets/custom_app_bar.dart';
 import 'package:feed_price_generator/core/widgets/custom_elevated_button.dart';
@@ -57,9 +59,7 @@ class _ImageDisplayViewState extends State<ImageDisplayView> {
 
       if (!status.isGranted) {
         // ignore: use_build_context_synchronously
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('يجب منح إذن التخزين لحفظ الصورة')),
-        );
+        showSnackBar(context, 'يجب منح إذن التخزين لحفظ الصورة!');
         return;
       }
 
@@ -71,14 +71,10 @@ class _ImageDisplayViewState extends State<ImageDisplayView> {
       );
 
       // ignore: use_build_context_synchronously
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('تم حفظ الصورة في المعرض بنجاح')),
-      );
+      showSnackBar(context, 'تم حفظ الصورة في المعرض بنجاح');
     } catch (e) {
       // ignore: use_build_context_synchronously
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('خطأ في حفظ الصورة: $e')));
+      showSnackBar(context, 'خطأ في حفظ الصورة: $e');
     } finally {
       setState(() {
         _isSaving = false;
@@ -106,15 +102,11 @@ class _ImageDisplayViewState extends State<ImageDisplayView> {
 
       if (result.status == ShareResultStatus.success) {
         // ignore: use_build_context_synchronously
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(const SnackBar(content: Text('تم مشاركة الصورة بنجاح')));
+        showSnackBar(context, 'تم مشاركة الصورة بنجاح');
       }
     } catch (e) {
       // ignore: use_build_context_synchronously
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('خطأ في مشاركة الصورة: $e')));
+      showSnackBar(context, 'خطأ في مشاركة الصورة: $e');
     }
   }
 
@@ -128,6 +120,10 @@ class _ImageDisplayViewState extends State<ImageDisplayView> {
     );
   }
 
+  void _finish() {
+    Navigator.pushNamed(context, HomeView.routeName);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -137,7 +133,7 @@ class _ImageDisplayViewState extends State<ImageDisplayView> {
         child: Column(
           children: [
             Expanded(child: ImagePreview(imageBytes: widget.imageBytes)),
-            const SizedBox(height: kSizedBoxBaseHeight - 4),
+            const SizedBox(height: kSizedBoxMediumHeight),
             SizedBox(
               width: double.infinity,
               child: CustomElevatedButton(
@@ -146,7 +142,7 @@ class _ImageDisplayViewState extends State<ImageDisplayView> {
                 backgroundColor: kCTAColor,
               ),
             ),
-            const SizedBox(height: kSizedBoxBaseHeight - 4),
+            const SizedBox(height: kSizedBoxMediumHeight),
             SizedBox(
               width: double.infinity,
               child: CustomElevatedButton(
@@ -154,13 +150,18 @@ class _ImageDisplayViewState extends State<ImageDisplayView> {
                 onPressed: _shareImage,
               ),
             ),
-            const SizedBox(height: kSizedBoxBaseHeight - 4),
+            const SizedBox(height: kSizedBoxMediumHeight),
             SizedBox(
               width: double.infinity,
               child: CustomElevatedButton(
                 buttonText: "تعديل الأسعار",
                 onPressed: _editPrices,
               ),
+            ),
+            const SizedBox(height: kSizedBoxMediumHeight),
+            SizedBox(
+              width: double.infinity,
+              child: CustomElevatedButton(buttonText: "تم", onPressed: _finish),
             ),
           ],
         ),

@@ -23,7 +23,9 @@ const kFontColor2 = Color(0xFF9E7D47);
 // Dimensions
 const double kPrimaryPaddding = 16.0;
 const double kButtonsBorderRadius = 8.0;
-const double kSizedBoxBaseHeight = 16.0;
+const double kSizedBoxMaxHeight = 16.0;
+const double kSizedBoxMediumHeight = 12.0;
+const double kSizedBoxMinHeight = 16.0;
 const double kSizedBoxBaseWidth = 8.0;
 const double kCardBorderRadius = 12.0;
 const double kCardMargin = 16.0;

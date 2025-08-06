@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:developer';
 import 'package:feed_price_generator/models/product_list.dart';
 import 'package:path_provider/path_provider.dart';
 import 'dart:io';
@@ -31,7 +32,7 @@ class StorageService {
         (a, b) => b.createdAt.compareTo(a.createdAt),
       ); // Sort by newest first
     } catch (e) {
-      print('Error loading product lists: $e');
+      log('Error loading product lists: $e');
       return [];
     }
   }
@@ -59,7 +60,7 @@ class StorageService {
 
       await file.writeAsString(json.encode(jsonList));
     } catch (e) {
-      print('Error saving product list: $e');
+      log('Error saving product list: $e');
     }
   }
 
@@ -76,7 +77,7 @@ class StorageService {
 
       await file.writeAsString(json.encode(jsonList));
     } catch (e) {
-      print('Error deleting product list: $e');
+      log('Error deleting product list: $e');
     }
   }
 
@@ -87,7 +88,7 @@ class StorageService {
         await file.delete();
       }
     } catch (e) {
-      print('Error clearing product lists: $e');
+      log('Error clearing product lists: $e');
     }
   }
 }
